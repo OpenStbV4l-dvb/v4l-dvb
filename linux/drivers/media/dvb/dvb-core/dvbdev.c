@@ -201,7 +201,7 @@ int dvb_register_device(struct dvb_adapter *adap, struct dvb_device **pdvbdev,
 {
 	struct dvb_device *dvbdev;
 	struct file_operations *dvbdevfops;
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,18)
+#if LINUX_VERSION_CODE > KERNEL_VERSION(2,6,18)
 	struct device *clsdev;
 #else
 	struct class_device *clsdev;
@@ -276,10 +276,13 @@ int dvb_register_device(struct dvb_adapter *adap, struct dvb_device **pdvbdev,
 	clsdev = device_create_drvdata(dvb_class, adap->device,
 			       MKDEV(DVB_MAJOR, minor),
 			       dvbdev, "dvb%d.%s%d", adap->num, dnames[type], id);
-#else
+#elif LINUX_VERSION_CODE > KERNEL_VERSION(2, 6, 18)
 	clsdev = device_create(dvb_class, adap->device,
 			       MKDEV(DVB_MAJOR, minor),
 			       "dvb%d.%s%d", adap->num, dnames[type], id);
+#else
+	clsdev = class_device_create(dvb_class, NULL, MKDEV(DVB_MAJOR, minor),
+			    adap->device, "dvb%d.%s%d", adap->num, dnames[type], id);
 #endif
 	if (IS_ERR(clsdev)) {
 		printk(KERN_ERR "%s: failed to create device dvb%d.%s%d (%ld)\n",
@@ -304,7 +307,11 @@ void dvb_unregister_device(struct dvb_device *dvbdev)
 	dvb_minors[dvbdev->minor] = NULL;
 	up_write(&minor_rwsem);
 
+#if LINUX_VERSION_CODE > KERNEL_VERSION(2,6,18)
 	device_destroy(dvb_class, MKDEV(DVB_MAJOR, dvbdev->minor));
+#else
+	class_device_destroy(dvb_class, MKDEV(DVB_MAJOR, dvbdev->minor));
+#endif
 
 	list_del (&dvbdev->list_head);
 	kfree (dvbdev->fops);
