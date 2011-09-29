@@ -1218,13 +1218,6 @@ static int dtv_property_process_get(struct dvb_frontend *fe,
 {
 	int r = 0;
 
-	/* Allow the frontend to validate incoming properties */
-	if (fe->ops.get_property)
-		r = fe->ops.get_property(fe, tvp);
-
-	if (r < 0)
-		return r;
-
 	switch(tvp->cmd) {
 	case DTV_FREQUENCY:
 		tvp->u.data = fe->dtv_property_cache.frequency;
@@ -1338,6 +1331,14 @@ static int dtv_property_process_get(struct dvb_frontend *fe,
 		break;
 	default:
 		r = -1;
+	}
+
+	/* Allow the frontend to override outgoing properties */
+	if (!r && fe->ops.get_property) {
+		r = fe->ops.get_property(fe, tvp);
+
+		if (r < 0)
+			return r;
 	}
 
 	dtv_property_dump(tvp);
