@@ -236,22 +236,8 @@ release:
 $(obj)/.version:
 ifneq ($(DIR),)
 	@echo "Searching in $(DIR)/Makefile for kernel version."
-	@perl \
-	-e '$$d="$(DIR)"; ' \
-	-e 'S: open IN,"$$d/Makefile"; ' \
-	-e 'while (<IN>) {' \
-	-e '	if (/^VERSION\s*=\s*(\d+)/){ $$version=$$1; }' \
-	-e '	elsif (/^PATCHLEVEL\s*=\s*(\d+)/){ $$level=$$1; }' \
-	-e '	elsif (/^SUBLEVEL\s*=\s*(\d+)/){ $$sublevel=$$1; }' \
-	-e '	elsif (/^EXTRAVERSION\s*=\s*(\S+)\n/){ $$extra=$$1; }' \
-	-e '    elsif (/^KERNELSRC\s*:=\s*(\S.*)\n/ || /^MAKEARGS\s*:=\s*-C\s*(\S.*)\n/)' \
-	-e '        { $$o=$$d; $$d=$$1; goto S; }' \
-	-e '};' \
-	-e 'printf ("VERSION=%s\nPATCHLEVEL:=%s\nSUBLEVEL:=%s\nKERNELRELEASE:=%s.%s.%s%s\n",' \
-	-e '	$$version,$$level,$$sublevel,$$version,$$level,$$sublevel,$$extra);' \
-	-e 'print "OUTDIR:=$$o\n" if($$o);' \
-	-e 'print "SRCDIR:=$$d\n";' > $(obj)/.version
-	@cat .version|grep KERNELRELEASE:|sed s,'KERNELRELEASE:=','Forcing compiling to version ',
+	@perl scripts/generate-dot-version.pl "$(DIR)" > $(obj)/.version
+	@grep KERNELRELEASE: $(obj)/.version | sed s,'KERNELRELEASE:=','Forcing compiling to version ',
 
 	@if [ ! -f $(DIR)/scripts/kallsyms ]; then \
 		echo "*** Warning: You should configure and build kernel before compiling V4L"; \
