@@ -1161,10 +1161,9 @@ static void dtv_property_adv_params_sync(struct dvb_frontend *fe)
 		break;
 	}
 
-	if(c->delivery_system == SYS_ISDBT) {
-		/* Fake out a generic DVB-T request so we pass validation in the ioctl */
-		p->frequency = c->frequency;
-		p->inversion = c->inversion;
+	/* Fake out a generic DVB-T request so we pass validation in the ioctl */
+	if ((c->delivery_system == SYS_ISDBT) ||
+	    (c->delivery_system == SYS_DVBT2)) {
 		p->u.ofdm.constellation = QAM_AUTO;
 		p->u.ofdm.code_rate_HP = FEC_AUTO;
 		p->u.ofdm.code_rate_LP = FEC_AUTO;
