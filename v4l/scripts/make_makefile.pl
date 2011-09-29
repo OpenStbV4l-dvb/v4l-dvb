@@ -223,7 +223,7 @@ while (my ($dir, $files) = each %instdir) {
 	print OUT "echo -n \"\$\$i \"; ";
 	print OUT "install -m 644 -c \$\$i \$(DESTDIR)\$(KDIR26)/$dir; fi; done; ";
 	print OUT "if [  \$\$n -ne 0 ]; then echo; ";
-	print OUT "strip --strip-debug \$(DESTDIR)\$(KDIR26)/$dir/*.ko; ";
+	print OUT "\$(CROSS_COMPILE)strip --strip-debug \$(DESTDIR)\$(KDIR26)/$dir/*.ko; ";
 	print OUT "fi;\n\n";
 }
 print OUT "\t@echo\n";
