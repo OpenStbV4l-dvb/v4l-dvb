@@ -204,6 +204,7 @@ open_makefile('../linux/drivers/media/Makefile');
 find({wanted => \&parse_dir, no_chdir => 1}, '../linux/drivers/staging');
 
 # Creating Install rule
+print OUT "DEPMOD ?= \"/sbin/depmod\"\n";
 print OUT "media-install::\n";
 
 removeobsolete();
@@ -226,7 +227,7 @@ while (my ($dir, $files) = each %instdir) {
 	print OUT "fi;\n\n";
 }
 print OUT "\t@echo\n";
-print OUT "\t/sbin/depmod -a \$(KERNELRELEASE) \$(if \$(DESTDIR),-b \$(DESTDIR))\n\n";
+print OUT "\t\$(DEPMOD) -a \$(KERNELRELEASE) \$(if \$(DESTDIR),-b \$(DESTDIR))\n\n";
 
 # Creating Remove rule
 print OUT "media-rminstall::\n";

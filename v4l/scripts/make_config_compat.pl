@@ -102,6 +102,25 @@ sub check_bool()
 	close INDEP;
 }
 
+sub check_uintptr_t()
+{
+	my $file = "$kdir/include/linux/types.h";
+	my $need_type = 1;
+
+	open INDEP, "<$file" or die "File not found: $file";
+	while (<INDEP>) {
+		if (m/^\s*typedef.*uintptr_t;/) {
+			$need_type = 0;
+			last;
+		}
+	}
+
+	if ($need_type) {
+		$out.= "\n#define NEED_UINTPTR_T_TYPE 1\n";
+	}
+	close INDEP;
+}
+
 sub check_is_singular()
 {
 	my $file = "$kdir/include/linux/list.h";
@@ -365,6 +384,7 @@ sub check_other_dependencies()
 	check_snd_ctl_boolean_mono_info();
 	check_snd_pcm_rate_to_rate_bit();
 	check_bool();
+	check_uintptr_t();
 	check_is_singular();
 	check_clamp();
 	check_proc_create();

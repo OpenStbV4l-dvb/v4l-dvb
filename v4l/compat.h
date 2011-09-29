@@ -33,6 +33,10 @@
 #include <linux/i2c-dev.h>
 #endif
 
+#ifndef kmalloc_track_caller
+#define kmalloc_track_caller(size, flags) ____kmalloc(size, flags)
+#endif
+
 #if LINUX_VERSION_CODE < KERNEL_VERSION(2, 6, 30)
 #include <linux/mm.h>
 #include <asm/uaccess.h>
@@ -55,6 +59,18 @@ static inline void *memdup_user(const void __user *src, size_t len)
 		return ERR_PTR(-EFAULT);
 	}
 
+	return p;
+}
+#endif
+
+#if LINUX_VERSION_CODE < KERNEL_VERSION(2, 6, 19)
+static inline void *kmemdup(const void *src, size_t len, gfp_t gfp)
+{
+	void *p;
+
+	p = kmalloc_track_caller(len, gfp);
+	if (p)
+		memcpy(p, src, len);
 	return p;
 }
 #endif
@@ -368,7 +384,8 @@ static inline struct proc_dir_entry *proc_create_data(const char *a,
 #define hweight64(x)  generic_hweight64(x)
 #endif
 
-#if LINUX_VERSION_CODE < KERNEL_VERSION(2, 6, 24)
+#ifdef NEED_UINTPTR_T_TYPE
+/* uintptr_t type was added in 2.6.24 */
 typedef unsigned long uintptr_t;
 #endif
 

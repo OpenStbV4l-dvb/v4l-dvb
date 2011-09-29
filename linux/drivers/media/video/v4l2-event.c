@@ -28,6 +28,7 @@
 
 #include <linux/sched.h>
 #include <linux/slab.h>
+#include "compat.h"
 
 int v4l2_event_init(struct v4l2_fh *fh)
 {
