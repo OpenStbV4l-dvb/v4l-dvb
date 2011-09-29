@@ -311,7 +311,7 @@ struct bcm3510_hab_cmd_bert_control {
 #define MSGID_TRI_STATE 0x2e
 struct bcm3510_hab_cmd_tri_state {
 	u8 RE :1; /* a/d ram port pins */
-	u8 PE :1; /* baud clock pin */
+	u8 XE :1; /* baud clock pin */
 	u8 AC :1; /* a/d clock pin */
 	u8 BE :1; /* baud clock pin */
 	u8 unused :4;
